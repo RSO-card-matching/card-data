@@ -8,3 +8,4 @@
 
 - add new cards
 - filter cards by name, series, manufacturer
+- stuff
