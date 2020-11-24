@@ -28,4 +28,4 @@ jobs:
       with:
         file: ./Dockerfile
         push: true
-        tags: cardmatching/card-data:${{ steps.time.outputs.time }}
+        tags: cardmatching/card-data:${{ steps.time.outputs.time }},cardmatching/card-data:latest

@@ -1,7 +1,7 @@
 # pylint: disable=no-name-in-module
 
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 from os import getenv
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Path, status
@@ -35,7 +35,7 @@ if (getenv("OAUTH_TOKEN_PROVIDER") == None):
     print("Please provide token provider URL!")
     exit(-1)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl = getenv("OAUTH_TOKEN_PROVIDER") + "/request_token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl = getenv("OAUTH_TOKEN_PROVIDER") + "/tokens")
 
 app = FastAPI()
 
@@ -58,8 +58,14 @@ async def get_current_user_from_token(token: str = Depends(oauth2_scheme)) -> in
 
 
 
-@app.get("/card/{card_id}", response_model = models.Card)
-async def read_my_data(current_user: int = Depends(get_current_user_from_token),
+@app.get("/cards", response_model = List[models.Card])
+async def return_all_cards(current_user: int = Depends(get_current_user_from_token),
+    db: Session = Depends(get_db)):
+    return database.get_all_cards(db)
+
+
+@app.get("/cards/{card_id}", response_model = models.Card)
+async def return_specific_card(current_user: int = Depends(get_current_user_from_token),
     card_id: int = Path(...),
     db: Session = Depends(get_db)):
     ret = database.get_card_by_id(db, card_id)
@@ -69,5 +75,15 @@ async def read_my_data(current_user: int = Depends(get_current_user_from_token),
             detail = "Card with given ID not found",
         )
     return ret
+
+
+@app.get("/health/live", response_model = str)
+async def liveness_check():
+    return "OK"
+
+
+@app.get("/health/ready", response_model = str)
+async def readiness_check():
+    return "OK"  # TODO: čekiranje baze or sth?
 
 

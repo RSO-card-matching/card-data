@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -54,3 +54,7 @@ def get_card_by_id(db: Session, cid: int) -> Optional[models.Card]:
     if card:
         return models.Card(**card.__dict__)
     return None
+
+
+def get_all_cards(db: Session) -> List[models.Card]:
+    return [models.Card(**card.__dict__) for card in db.query(models.CardModel).all()]
