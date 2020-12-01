@@ -58,13 +58,18 @@ async def get_current_user_from_token(token: str = Depends(oauth2_scheme)) -> in
 
 
 
-@app.get("/cards", response_model = List[models.Card])
+@app.get("/v1/cards", response_model = List[models.Card])
 async def return_all_cards(current_user: int = Depends(get_current_user_from_token),
     db: Session = Depends(get_db)):
     return database.get_all_cards(db)
 
 
-@app.get("/cards/{card_id}", response_model = models.Card)
+@app.get("/v1/cards/noauth", response_model = List[models.Card])
+async def return_all_cards_noauth(db: Session = Depends(get_db)):
+    return database.get_all_cards(db)
+
+
+@app.get("/v1/cards/{card_id}", response_model = models.Card)
 async def return_specific_card(current_user: int = Depends(get_current_user_from_token),
     card_id: int = Path(...),
     db: Session = Depends(get_db)):
@@ -85,5 +90,3 @@ async def liveness_check():
 @app.get("/health/ready", response_model = str)
 async def readiness_check():
     return "OK"  # TODO: čekiranje baze or sth?
-
-
