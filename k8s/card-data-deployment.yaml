@@ -29,6 +29,11 @@ spec:
             configMapKeyRef:
               key: OAUTH_SIGN_KEY
               name: card-matching-cluster-configmap
+        - name: OAUTH_TOKEN_PROVIDER
+          valueFrom:
+            configMapKeyRef:
+              key: OAUTH_TOKEN_PROVIDER
+              name: card-matching-cluster-configmap
         image: cardmatching/card-data:latest
         name: card-data
         terminationMessagePath: /dev/termination-log
