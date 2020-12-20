@@ -29,7 +29,7 @@ def get_db():
         db.close()
 
 # init testing DB
-database.initBase(database.SessionLocal())
+# database.initBase(database.SessionLocal())
 
 if (getenv("OAUTH_TOKEN_PROVIDER") == None):
     print("Please provide token provider URL!")

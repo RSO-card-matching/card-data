@@ -24,6 +24,11 @@ spec:
     spec:
       containers:
       - env:
+        - name: DATABASE_IP
+          valueFrom:
+            configMapKeyRef:
+              key: DATABASE_IP
+              name: card-matching-cluster-configmap
         - name: OAUTH_SIGN_KEY
           valueFrom:
             configMapKeyRef:

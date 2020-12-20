@@ -1,4 +1,5 @@
 from typing import Optional, List
+from os import getenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -6,11 +7,13 @@ from sqlalchemy.orm import sessionmaker, Session
 from . import models
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-# TODO: make selection using environment vars
+db_ip = getenv("DATABASE_IP")
+if db_ip:
+    SQLALCHEMY_DATABASE_URL = db_ip
+else:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
