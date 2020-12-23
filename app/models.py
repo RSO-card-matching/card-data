@@ -17,6 +17,21 @@ class Card(BaseModel):
     manufacturer: str
     serial_num: Optional[str] = None
 
+class CardNew(BaseModel):
+    title: str
+    series: str
+    manufacturer: str
+    serial_num: Optional[str] = None
+
+class CardUpdate(BaseModel):
+    title: Optional[str] = None
+    series: Optional[str] = None
+    manufacturer: Optional[str] = None
+    serial_num: Optional[str] = None
+
+class NewCardID(BaseModel):
+    id: int
+
 class CardModel(Base):
     __tablename__ = "cards"
     id = Column(Integer, primary_key = True, index = True)

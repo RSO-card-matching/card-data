@@ -60,19 +60,14 @@ async def get_current_user_from_token(token: str = Depends(oauth2_scheme)) -> in
 
 @app.get("/v1/cards", response_model = List[models.Card])
 async def return_all_cards(current_user: int = Depends(get_current_user_from_token),
-    db: Session = Depends(get_db)):
-    return database.get_all_cards(db)
-
-
-@app.get("/v1/cards/noauth", response_model = List[models.Card])
-async def return_all_cards_noauth(db: Session = Depends(get_db)):
+        db: Session = Depends(get_db)):
     return database.get_all_cards(db)
 
 
 @app.get("/v1/cards/{card_id}", response_model = models.Card)
 async def return_specific_card(current_user: int = Depends(get_current_user_from_token),
-    card_id: int = Path(...),
-    db: Session = Depends(get_db)):
+        card_id: int = Path(...),
+        db: Session = Depends(get_db)):
     ret = database.get_card_by_id(db, card_id)
     if (ret == None):
         raise HTTPException(
@@ -80,6 +75,48 @@ async def return_specific_card(current_user: int = Depends(get_current_user_from
             detail = "Card with given ID not found",
         )
     return ret
+
+
+@app.post("/v1/cards", response_model = models.NewCardID)
+async def create_new_card(card: models.CardNew,
+        current_user: int = Depends(get_current_user_from_token),
+        db: Session = Depends(get_db)):
+    new_id = database.insert_new_card(db, card)
+    return models.NewCardID(id = new_id)
+
+
+@app.patch("/v1/cards/{card_id}", response_model = None)
+async def update_card(to_update: models.CardUpdate,
+        card_id: int = Path(...),
+        current_user: int = Depends(get_current_user_from_token),
+        db: Session = Depends(get_db)):
+    try:
+        database.update_card(db, card_id, to_update)
+    except database.DBException:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Card with given ID not found"
+        )
+
+
+@app.delete("/v1/cards/{card_id}", response_model = None)
+async def remove_card(card_id: int = Path(...),
+        current_user: int = Depends(get_current_user_from_token),
+        db: Session = Depends(get_db)):
+    try:
+        database.delete_card(db, card_id)
+    except database.DBException:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Card with given ID not found"
+        )
+
+
+
+# za mejnik
+@app.get("/v1/cards/noauth", response_model = List[models.Card])
+async def return_all_cards_noauth(db: Session = Depends(get_db)):
+    return database.get_all_cards(db)
 
 
 @app.get("/health/live", response_model = str)
