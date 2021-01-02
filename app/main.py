@@ -1,7 +1,7 @@
 # pylint: disable=no-name-in-module
 
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional, List, Union
 from os import getenv
 import requests
 
@@ -74,17 +74,28 @@ async def return_all_cards(current_user: int = Depends(get_current_user_from_tok
     return database.get_all_cards(db)
 
 
-@app.get("/v1/cards/{card_id}", response_model = models.Card)
+@app.get("/v1/cards/{card_id}", response_model = Union[models.Card, List[Optional[models.Card]]])
 async def return_specific_card(current_user: int = Depends(get_current_user_from_token),
-        card_id: int = Path(...),
+        card_id: str = Path(...),
         db: Session = Depends(get_db)):
-    ret = database.get_card_by_id(db, card_id)
-    if (ret == None):
-        raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Card with given ID not found",
-        )
-    return ret
+    try:
+        cid_int = int(card_id)
+        ret = database.get_card_by_id(db, cid_int)
+        if (ret == None):
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "Card with given ID not found",
+            )
+        return ret
+    except ValueError:
+        try:
+            cards = card_id.split(",")
+            return [database.get_card_by_id(db, int(i)) for i in cards]
+        except ValueError:
+            raise HTTPException(
+                status_code = status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail = "'card_id' must be either an integer or a list of comma-separated integers",
+            )
 
 
 @app.post("/v1/cards", response_model = models.NewCardID)
