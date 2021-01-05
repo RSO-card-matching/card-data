@@ -15,7 +15,7 @@ RUN apk add py3-pip
 
 RUN pip install fastapi uvicorn python-multipart python-jose[cryptography]
 
-RUN pip install SQLAlchemy psycopg2
+RUN pip install SQLAlchemy psycopg2 graphene
 
 # COPY --from=builder /usr/local/lib /usr/local
 
