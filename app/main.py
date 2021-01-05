@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from . import models, database
+from . import models, database, graphql
 
 
 SECRET_KEY = getenv("OAUTH_SIGN_KEY")
@@ -131,6 +131,11 @@ async def remove_card(card_id: int = Path(...),
             status_code = status.HTTP_404_NOT_FOUND,
             detail = "Card with given ID not found"
         )
+
+
+
+# GraphQL
+app.add_route("/cards-graphql", graphql.make_app())
 
 
 
